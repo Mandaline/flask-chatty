@@ -12,6 +12,7 @@ pinecone = "*"
 langsmith = "*"
 python-dotenv = "*"
 langchain-pinecone = "*"
+supabase = "*"
 
 [dev-packages]
 
