@@ -13,6 +13,7 @@ langsmith = "*"
 python-dotenv = "*"
 langchain-pinecone = "*"
 supabase = "*"
+werkzeug = "*"
 
 [dev-packages]
 
