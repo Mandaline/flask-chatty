@@ -1,6 +1,6 @@
 from flask import Flask, jsonify, request
 from flask_cors import CORS
-from services import chat_response, generate_optimized_description
+from services import chat_response, generate_optimized_description, generate_keywords
 from supabase_operations import upload_image_to_supabase, store_in_supabase, get_image_data, get_product_by_id, delete_product_by_id, delete_image_from_storage
 from werkzeug.utils import secure_filename
 
@@ -47,7 +47,7 @@ def upload_image():
     if image_file and allowed_file(image_file.filename):
         # Secure the filename to prevent issues like directory traversal
         filename = secure_filename(image_file.filename)
-
+        print(f"filename uuuuuuu: {filename}")
         # Upload the image to Supabase Storage and get the public URL
         image_url = upload_image_to_supabase(image_file, filename)
 
@@ -57,8 +57,10 @@ def upload_image():
         # Generate an optimized description for the image using OpenAI
         optimized_description = generate_optimized_description(image_url, user_description, title)
 
+        keywords = generate_keywords(optimized_description)
+
         # Store the metadata in the Supabase database
-        store_in_supabase(title, user_description, optimized_description, image_url)
+        store_in_supabase(title, user_description, optimized_description, image_url, keywords)
 
         # Return the optimized description as the response
         return jsonify({"optimized_description": optimized_description})
