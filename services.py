@@ -18,17 +18,16 @@ llm = ChatOpenAI(model="gpt-4o-mini", openai_api_key=openai_api_key, max_tokens=
 
 def chat_response(user_query): 
 
-    prompt = ChatPromptTemplate.from_template("tell me a joke about {topic}")
+    prompt = ChatPromptTemplate.from_template("Recommend a product to the user based on their {input}")
 
     chain = prompt | llm | StrOutputParser()
 
-    return chain.invoke({"topic": user_query})
+    return chain.invoke({"input": user_query})
 
 
 def generate_optimized_description(image_url, user_description, title):
-    print(f"image_url weeeeeeee: {image_url}")
-    # Send the image URL to OpenAI Vision for optimization
-    prompt = f"Create a product description for a pair of sunglasses based on the image. The title of the product is {title}. The materials used in the construction of the sunglasses are in the {user_description}. Explain the style, shape, and details of the sunglasses based on what you see in the image. Focus particularly on the shape of the frames. Include the following in the final product description: Shape of the frames: Describe the specific geometry and style of the frames, focusing on whether they are round, square, oval, aviator, or any other shape. Style: Comment on the overall aesthetic, such as whether the sunglasses are modern, retro, sporty, or elegant. Materials: Use the materials input by the user to highlight their quality, texture, and how they contribute to design and functionality."
+    
+    prompt = f"Create a product description for a pair of sunglasses based on the image. The title of the product is {title}. The materials used in the construction of the sunglasses are in the {user_description}. Explain the style, shape, and details of the sunglasses based on what you see in the image. Focus particularly on the shape of the frames. Include the following in the final product description: Shape of the frames: Describe the specific geometry and style of the frames, focusing on whether they are round, square, oval, aviator, or any other shape. Style: Comment on the overall aesthetic, such as whether the sunglasses are modern, retro, sporty, or elegant. Materials: Use the materials input by the user to highlight their quality, texture, and how they contribute to design and functionality. Use an ### for the first title and ** for the bolded subtitles."
 
     response = client.chat.completions.create(
         model="gpt-4o-mini",
@@ -48,14 +47,25 @@ def generate_optimized_description(image_url, user_description, title):
         ],
         max_tokens=300,
     )
-   
-    # Extract the optimized description from OpenAI's response
+    
     optimized_description = response.choices[0].message.content
 
     return optimized_description
 
+def get_embedding_from_description(optimized_description):
+    try:
+        response = client.embeddings.create(input=[optimized_description], model="text-embedding-ada-002")
+        
+        embedding = response.data[0].embedding
+        
+        return embedding
+    
+    except Exception as e:
+        print(f"Error generating embedding: {e}")
+        return None
+
 def generate_keywords(description):
-	keyword_prompt = f"Extract the most important keywords or key phrases from this {description}. Return the keywords as a comma-separated list."
+	keyword_prompt = f"Extract the most important keywords or key phrases from this {description}. Return the keywords as a comma-separated list. The word 'sunglasses' should be excluded."
 
 	keyword_response = client.chat.completions.create(
         model="gpt-4o-mini",

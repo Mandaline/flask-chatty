@@ -54,13 +54,14 @@ def upload_image_to_supabase(image_file, filename):
         return None
 
 
-def store_in_supabase(title, user_description, optimized_description, image_url, keywords):
+def store_in_supabase(title, user_description, optimized_description, image_url, keywords, embeddings):
     data = {
         "title": title,
         "user_description": user_description,
         "optimized_description": optimized_description,
         "image_url": image_url,
-        "keywords": keywords
+        "keywords": keywords,
+        "product_embeddings": embeddings
     }
     supabase_client.table('image_data').insert(data).execute()
 
@@ -76,9 +77,11 @@ def get_product_by_id(product_id):
 
 def delete_product_by_id(product_id):
     response = supabase_client_public.table('image_data').delete().eq('id', product_id).execute()
-    if response.error:  # Access the 'error' attribute directly
-        return response.error['message']
-    return None 
+    print(f"Response: {response}")
+
+    if 'code' in response and response['code'] != 200:
+        return response['message']
+    return None
 
 def delete_image_from_storage(image_url):
     if image_url:
