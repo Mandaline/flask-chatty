@@ -2,9 +2,12 @@ import openai
 from langchain_openai import ChatOpenAI
 from dotenv import load_dotenv
 import os
+import numpy as np
 from openai import OpenAI
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.prompts import ChatPromptTemplate
+from supabase_operations import get_image_data
+import json
 
 
 load_dotenv()
@@ -16,14 +19,48 @@ openai_api_key = os.getenv("OPENAI_API_KEY")
 llm = ChatOpenAI(model="gpt-4o-mini", openai_api_key=openai_api_key, max_tokens=300)
 
 
+def get_embedding(text):
+    response = client.embeddings.create(input=[text], model="text-embedding-ada-002")
+    return response.data[0].embedding
+
+def cosine_similarity(v1, v2):
+    return np.dot(v1, v2) / (np.linalg.norm(v1) * np.linalg.norm(v2))
+
+def find_top_products(user_embedding, top_n=4):
+
+    products = get_image_data()
+    product_scores = []
+
+    for product in products:
+        product_embedding_str = product['product_embeddings']
+        product_embedding = json.loads(product_embedding_str)
+        
+        similarity = cosine_similarity(user_embedding, product_embedding)
+        product_scores.append((product, similarity))
+
+    product_scores.sort(key=lambda x: x[1], reverse=True)
+    return product_scores[:top_n]
+
+
 def chat_response(user_query): 
+    user_embedding = get_embedding(user_query)
 
-    prompt = ChatPromptTemplate.from_template("Recommend a product to the user based on their {input}")
+    top_products = find_top_products(user_embedding, top_n=4)
 
+    recommended_products = [
+        {"id": product["id"], "title": product["title"], "description": product["optimized_description"]}
+        for product, similarity in top_products
+    ]
+
+    recommended_products = json.dumps(recommended_products)
+    prompt = ChatPromptTemplate.from_template("You are a helpful shopping assistant trying to match customers with the right product. You will be given a {question} from a customer as and a list of {recommended_products} as the context with the title and description of the products available for sale that roughly match the customer's question. Respond with the two best product matches, with the title of each product, then a short summary of why the product is a good match for the customer. Wrap the title in a strong tag, like <strong>(title)</strong> and add a <br> before and after it. Use the product's id wrapped in a <span> tag with the className='hidden' and the id='product-id'")
+    
     chain = prompt | llm | StrOutputParser()
 
-    return chain.invoke({"input": user_query})
-
+    return chain.invoke({
+		"question": user_query,
+		"recommended_products": recommended_products
+	})
 
 def generate_optimized_description(image_url, user_description, title):
     

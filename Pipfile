@@ -15,6 +15,7 @@ langchain-pinecone = "*"
 supabase = "*"
 werkzeug = "*"
 requests = "*"
+numpy = "*"
 
 [dev-packages]
 
