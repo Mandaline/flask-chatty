@@ -8,6 +8,7 @@ from langchain_core.output_parsers import StrOutputParser
 from langchain_core.prompts import ChatPromptTemplate
 from supabase_operations import get_image_data
 import json
+from bs4 import BeautifulSoup
 
 
 load_dotenv()
@@ -17,7 +18,6 @@ client = OpenAI()
 openai_api_key = os.getenv("OPENAI_API_KEY")
 
 llm = ChatOpenAI(model="gpt-4o-mini", openai_api_key=openai_api_key, max_tokens=300)
-
 
 def get_embedding(text):
     response = client.embeddings.create(input=[text], model="text-embedding-ada-002")
@@ -118,3 +118,14 @@ def generate_keywords(description):
 	attributes = keyword_response.choices[0].message.content.strip()
 
 	return attributes
+
+def extract_product_ids_from_response(chat_result):
+    soup = BeautifulSoup(chat_result, "html.parser")
+    product_ids = []
+
+    # Find all span elements with id="product-id"
+    for span in soup.find_all("span", id="product-id"):
+        product_id = span.get_text()  # Extract the text inside the span (product ID)
+        product_ids.append(product_id)
+
+    return product_ids

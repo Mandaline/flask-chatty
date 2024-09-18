@@ -1,6 +1,6 @@
 from flask import Flask, jsonify, request
 from flask_cors import CORS
-from services import chat_response, generate_optimized_description, generate_keywords, get_embedding_from_description
+from services import chat_response, generate_optimized_description, generate_keywords, get_embedding_from_description, extract_product_ids_from_response
 from supabase_operations import upload_image_to_supabase, store_in_supabase, get_image_data, get_product_by_id, delete_product_by_id, delete_image_from_storage
 from werkzeug.utils import secure_filename
 
@@ -21,7 +21,22 @@ def chat():
     if not user_query:
         return "No message provided", 400
     
-    return chat_response(user_query)
+    chat_result = chat_response(user_query)
+
+    product_ids = extract_product_ids_from_response(chat_result)
+
+    products = []
+    for product_id in product_ids:
+        product = get_product_by_id(product_id)
+        if product:
+            products.append(product)
+
+    response_data = {
+        "message": chat_result,
+        "products": products
+    }
+
+    return jsonify(response_data)
 
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'webp'}
 
