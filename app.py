@@ -48,7 +48,6 @@ def allowed_file(filename):
 
 @app.route('/api/upload-image', methods=['POST'])
 def upload_image():
-    print("running")
     
     # Check if the image, title, and description are provided in the request
     if 'image' not in request.files or 'description' not in request.form or 'title' not in request.form:

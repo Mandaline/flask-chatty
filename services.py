@@ -9,7 +9,7 @@ from langchain_core.prompts import ChatPromptTemplate
 from supabase_operations import get_image_data
 import json
 from bs4 import BeautifulSoup
-from face_shapes import face_shapes_guide_prompt, face_shapes_guide
+from face_shapes import face_shapes_guide_prompt, face_shapes_guide, sunglass_styles
 
 
 load_dotenv()
@@ -125,7 +125,17 @@ def chat_response(user_query, screenshot, selected_shape):
 
 def generate_optimized_description(image_url, user_description, title):
     
-    prompt = f"Create a product description for a pair of sunglasses based on the image. The title of the product is {title}. The materials used in the construction of the sunglasses are in the {user_description}. Explain the style, shape, and details of the sunglasses based on what you see in the image. Focus particularly on the shape of the frames. Include the following in the final product description: Shape of the frames: Describe the specific geometry and style of the frames, focusing on whether they are round, square, oval, aviator, or any other shape. Style: Comment on the overall aesthetic, such as whether the sunglasses are modern, retro, sporty, or elegant. Materials: Use the materials input by the user to highlight their quality, texture, and how they contribute to design and functionality. Use an ### for the first title and ** for the bolded subtitles."
+    sunglass_styles_prompt = f"""
+		Create a product description for a pair of sunglasses based on the image. 
+		The title of the product is {title}. The materials used in the construction of the sunglasses are in the {user_description}. 
+		Explain the style, shape, and details of the sunglasses based on what you see in the image, using the this guide to sunglasses to create a description {sunglass_styles}
+		Include the following in the final product description, but be concise and try to use only the user description and the guide: 
+		Frame types: Describe the specific geometry and style of the frames.
+		Style: Comment on the overall aesthetic. 
+		Materials: Describe the materials, lens types and colors.
+		Face shape matches: What face shapes are best and why. Include all the best for recommendations in the sunglass styles guide.
+		Use an ### for the first title and ** for the bolded subtitles.
+	""" 
 
     response = client.chat.completions.create(
         model="gpt-4o-mini",
@@ -133,7 +143,7 @@ def generate_optimized_description(image_url, user_description, title):
           {
             "role": "user",
             "content": [
-              { "type": "text", "text": prompt},
+              { "type": "text", "text": sunglass_styles_prompt},
               {
                 "type": "image_url",
                 "image_url": {
@@ -163,7 +173,7 @@ def get_embedding_from_description(optimized_description):
         return None
 
 def generate_keywords(description):
-	keyword_prompt = f"Extract the most important keywords or key phrases from this {description}. Return the keywords as a comma-separated list. The word 'sunglasses' should be excluded."
+	keyword_prompt = f"Extract the most important keywords or key phrases from this {description}. Return the keywords as a comma-separated list. The word 'sunglasses' and the title of the glasses should be excluded."
 
 	keyword_response = client.chat.completions.create(
         model="gpt-4o-mini",
