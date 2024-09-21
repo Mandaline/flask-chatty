@@ -17,11 +17,12 @@ print(hello_world())
 def chat():
     data = request.get_json()
     user_query = data.get("message")
-    print(f"Request body: {data}")
+    screenshot = data.get("screenshot")
+    
     if not user_query:
         return "No message provided", 400
     
-    chat_result = chat_response(user_query)
+    chat_result = chat_response(user_query, screenshot)
 
     product_ids = extract_product_ids_from_response(chat_result)
 
