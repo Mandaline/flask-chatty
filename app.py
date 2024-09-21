@@ -16,13 +16,15 @@ print(hello_world())
 @app.route('/api/chat', methods=['POST'])
 def chat():
     data = request.get_json()
+    print(f"Request body: {data}") 
     user_query = data.get("message")
-    screenshot = data.get("screenshot")
+    screenshot = data.get("screenshot", None)
+    selected_shape = data.get("faceShape", None)
     
     if not user_query:
         return "No message provided", 400
     
-    chat_result = chat_response(user_query, screenshot)
+    chat_result = chat_response(user_query, screenshot, selected_shape)
 
     product_ids = extract_product_ids_from_response(chat_result)
 

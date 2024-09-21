@@ -9,7 +9,7 @@ from langchain_core.prompts import ChatPromptTemplate
 from supabase_operations import get_image_data
 import json
 from bs4 import BeautifulSoup
-from face_shapes import face_shapes_guide
+from face_shapes import face_shapes_guide_prompt, face_shapes_guide
 
 
 load_dotenv()
@@ -32,7 +32,7 @@ def get_type_recommendation(image_url):
           {
             "role": "user",
             "content": [
-              { "type": "text", "text": face_shapes_guide},
+              { "type": "text", "text": face_shapes_guide_prompt},
               {
                 "type": "image_url",
                 "image_url": {
@@ -48,6 +48,31 @@ def get_type_recommendation(image_url):
     type_recommendation = response.choices[0].message.content
 
     return type_recommendation
+
+def get_type_recommendation_text(selected_shape):
+    print(selected_shape)
+    prompt = f"""
+    This is the user's selected face shape: {selected_shape}. 
+    Please respond with the user's face shape and and provide recommendations for sunglasses that would suit that shape
+    based on the following face shapes guide: 
+    {face_shapes_guide}
+    """
+
+    response = client.chat.completions.create(
+        model="gpt-4o-mini",
+        messages=[
+          {
+            "role": "user",
+            "content": prompt
+          },
+        ],
+        max_tokens=300,
+    )
+
+    shape_recommendation = response.choices[0].message.content
+
+    return shape_recommendation
+
 
 def cosine_similarity(v1, v2):
     return np.dot(v1, v2) / (np.linalg.norm(v1) * np.linalg.norm(v2))
@@ -68,29 +93,34 @@ def find_top_products(user_embedding, top_n=4):
     return product_scores[:top_n]
 
 
-def chat_response(user_query, screenshot): 
-    shape_recomendation = get_type_recommendation(screenshot)
-    combined_text = f"User's request: {user_query}\nType recommendation: {shape_recomendation}"
+def chat_response(user_query, screenshot, selected_shape): 
+    if screenshot:
+        shape_recommendation = get_type_recommendation(screenshot) 
+    else:
+        shape_recommendation = get_type_recommendation_text(selected_shape)
+   
+    combined_text = f"User's request: {user_query}\nType recommendation: {shape_recommendation}"
     print(f"combined_text: {combined_text}")
-    user_embedding = get_embedding(combined_text)
+    # user_embedding = get_embedding(combined_text)
 
-    top_products = find_top_products(user_embedding, top_n=2)
+    # top_products = find_top_products(user_embedding, top_n=2)
 
-    recommended_products = [
-        {"id": product["id"], "title": product["title"], "description": product["optimized_description"]}
-        for product, similarity in top_products
-    ]
+    # recommended_products = [
+    #     {"id": product["id"], "title": product["title"], "description": product["optimized_description"]}
+    #     for product, similarity in top_products
+    # ]
 
-    recommended_products = json.dumps(recommended_products)
-    prompt = ChatPromptTemplate.from_template("You are a helpful shopping assistant trying to match customers with the right product. You will be given a {question} from a customer, a recommendation about what style of glasses look best for their face shape {shape_recomendation} and a list of {recommended_products} as the context with the title and description of the products available for sale that roughly match the customer's question and shape recommendation. Respond with the face shape identified in <strong> tags along with the two best product matches, prioritizing the users question over the shape, with the title of each product, then a short summary of why the product is a good match for the customer, including what makes it appropriate for the face shape. Wrap the title in a strong tag, like <strong>(title)</strong> and add a <br> before and after it. Use the product's id wrapped in a <span> tag with the className='hidden' and the id='product-id'")
+    # recommended_products = json.dumps(recommended_products)
+    # prompt = ChatPromptTemplate.from_template("You are a helpful shopping assistant trying to match customers with the right product. You will be given a {question} from a customer, a recommendation about what style of glasses look best for their face shape {shape_recomendation} and a list of {recommended_products} as the context with the title and description of the products available for sale that roughly match the customer's question and shape recommendation. Respond with the face shape identified in <strong> tags along with the two best product matches, prioritizing the users question over the shape, with the title of each product, then a short summary of why the product is a good match for the customer, including what makes it appropriate for the face shape. Wrap the title in a strong tag, like <strong>(title)</strong> and add a <br> before and after it. Use the product's id wrapped in a <span> tag with the className='hidden' and the id='product-id'")
     
-    chain = prompt | llm | StrOutputParser()
+    # chain = prompt | llm | StrOutputParser()
 
-    return chain.invoke({
-		"question": user_query,
-		"recommended_products": recommended_products,
-		"shape_recomendation": shape_recomendation
-	})
+    # return chain.invoke({
+	# 	"question": user_query,
+	# 	"recommended_products": recommended_products,
+	# 	"shape_recomendation": shape_recommendation
+	# })
+    return shape_recommendation
    
 
 def generate_optimized_description(image_url, user_description, title):

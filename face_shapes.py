@@ -1,12 +1,4 @@
 face_shapes_guide = """
-	Look at this image and decide which face shape is closest to the face in the image.
-
-	Step-by-Step Process:
-	Look at the Forehead, Cheekbones, Jawline, and Chin:
-
-	Focus on the width and proportions of these areas to identify which parts of the face are the widest or most prominent.
-
-	Compare the Face to the Following Shape Categories:
 	Round: A round face has soft angles with the width almost equal to the length. The cheeks are typically the widest part, and the jawline is rounded rather than angular.
 	Sunglasses Recommendation: Angular frames like square or rectangular sunglasses work well to add definition to soft facial features.
 
@@ -27,6 +19,18 @@ face_shapes_guide = """
 
 	Rectangular: A rectangular face is longer than it is wide, with a straight jawline and evenly spaced cheekbones and forehead. The face may appear angular or sharp.
 	Sunglasses Recommendation: Oversized or wrap-around sunglasses help shorten the length of the face and add balance to its features.
+	"""
+
+face_shapes_guide_prompt = f"""
+	Look at this image and decide which face shape is closest to the face in the image.
+
+	Step-by-Step Process:
+	Look at the Forehead, Cheekbones, Jawline, and Chin:
+
+	Focus on the width and proportions of these areas to identify which parts of the face are the widest or most prominent.
+
+	Compare the Face to the Following Shape Categories:
+  	{face_shapes_guide}
 
 	Task:
 	Identify the Face Shape:
