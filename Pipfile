@@ -17,6 +17,7 @@ werkzeug = "*"
 requests = "*"
 numpy = "*"
 bs4 = "*"
+flask-cors = "*"
 
 [dev-packages]
 
