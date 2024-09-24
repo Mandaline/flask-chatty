@@ -98,9 +98,9 @@ def chat_response(user_query, screenshot, selected_shape):
     else:
         shape_recommendation = get_type_recommendation_text(selected_shape)
    
-    combined_text = f"User's request: {user_query}\nType recommendation: {shape_recommendation}"
-    print(f"combined_text: {combined_text}")
-    user_embedding = get_embedding(combined_text)
+    # combined_text = f"User's request: {user_query}\nType recommendation: {shape_recommendation}"
+    # print(f"combined_text: {combined_text}")
+    user_embedding = get_embedding(user_query)
 
     top_products = find_top_products(user_embedding, top_n=4)
 
@@ -111,9 +111,10 @@ def chat_response(user_query, screenshot, selected_shape):
     
     prompt_text = """
     	You are a helpful shopping assistant trying to match customers with the right product. 
-    	You will be given a {question} from a customer, a recommendation about what style of glasses look best for their face shape {shape_recomendation} and a list of {recommended_products} as the context with the title and description of the products available for sale that roughly match the customer's question and shape recommendation.
-    	First identify the products that best match the user's question, then from those, find two that match their face shape recommendation. If there are none, apologize and make an alternative recommendation that is the closest match to their request.
-        Respond with the face shape identified in <strong> tags, no parantheses, along with the two best product matches, with the title of each product, then a short summary of why the product is a good match for the customer, including what makes it appropriate for the face shape. 
+    	You will be given a {question} from a customer, and a list of {recommended_products} of the products available for sale that roughly match the customer's question.
+    	Among the products given, find two that best match their question but also their face shape based on this recommendation about what style of glasses look best for their face shape {shape_recomendation}.
+        If there are none matching their question, apologize and make an alternative recommendation that is the closest match to their request.
+        Respond with the face shape identified in the shape recommendation using <strong> tags, no parantheses, along with the two best product matches, with the title of each product, then a short summary of why the product is a good match for the customer, including what makes it appropriate for the face shape. 
     	Wrap the title in a strong tag, like <strong>(title)</strong> and add a <br> before and after it. Use the product's id wrapped in a <span> tag with the className='hidden' and the id='product-id'
     """
 
