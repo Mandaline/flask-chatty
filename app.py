@@ -16,7 +16,6 @@ print(hello_world())
 @app.route('/api/chat', methods=['POST'])
 def chat():
     data = request.get_json()
-    print(f"Request body: {data}") 
     user_query = data.get("message")
     screenshot = data.get("screenshot", None)
     selected_shape = data.get("faceShape", None)

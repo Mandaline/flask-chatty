@@ -85,6 +85,5 @@ def delete_product_by_id(product_id):
 
 def delete_image_from_storage(image_url):
     if image_url:
-        print(f"image url {image_url}")
         path = image_url.split("/")[-1]
         supabase_client.storage.from_('images').remove([path])

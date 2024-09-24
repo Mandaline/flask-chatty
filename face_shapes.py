@@ -39,7 +39,7 @@ face_shapes_guide_prompt = f"""
 	After identifying the face shape, recommend one or more styles of sunglasses that would complement the identified face shape, based on the guidelines provided above.
 """
 
-sunglass_styles= """
+sunglass_styles = """
 	Aviator:
 	Description: Classic teardrop shape, thin metal frame, often with a double bridge. Known for their military origin and sleek look.
 	Best for: Square, oval, diamond, triangle, and heart-shaped faces. The curved teardrop lens balances strong jawlines and adds softness to angular features.
