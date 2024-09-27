@@ -1,13 +1,14 @@
-from dotenv import load_dotenv
 import os
-import supabase
+from dotenv import load_dotenv
 import requests
+import supabase
 
 load_dotenv()
 
 SUPABASE_URL = os.getenv("SUPABASE_URL")
 SUPABASE_KEY = os.getenv("SUPABASE_KEY")
 SUPABASE_PUBLIC_KEY = os.getenv("SUPABASE_PUBLIC_KEY")
+
 supabase_client = supabase.create_client(SUPABASE_URL, SUPABASE_KEY)
 supabase_client_public = supabase.create_client(SUPABASE_URL, SUPABASE_PUBLIC_KEY)
 
