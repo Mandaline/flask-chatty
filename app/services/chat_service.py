@@ -71,7 +71,7 @@ def chat_response(user_query, screenshot, selected_shape):
     else:
         shape_recommendation = get_type_recommendation_text(selected_shape)
    
-    print(f"combined_text: {shape_recommendation}")
+    print(f"recomendation text: {shape_recommendation}")
     user_embedding = get_embedding(user_query)
 
     top_products = find_top_products(user_embedding, top_n=4)
@@ -86,7 +86,8 @@ def chat_response(user_query, screenshot, selected_shape):
     	You will be given a {question} from a customer, and a list of {recommended_products} of the products available for sale that roughly match the customer's question.
     	Among the products given, find two that best match their question but also their face shapes based on this recommendation about what style of glasses look best for their face shapes {shape_recomendation}.
       If there are none matching their question, apologize and make an alternative recommendation that is the closest match to their request.
-      Respond with the two face shapes identified if there are two, or one in that case of one, in the shape recommendation using <strong> tags, no parantheses, along with the two best product matches, with the title of each product, then a short summary of why the product is a good match for the customer, including what makes it appropriate for the face shape. 
+      Respond with the one or two face shapes identified in the shape recommendation using <strong> tags, no parantheses. If there are two face shapes, name the first as the primary face shape and the second as the secondary one.
+      Then give the two best product matches, with the title of each product, then a short summary of why the product is a good match for the customer, including what makes it appropriate for the face shape. 
     	Wrap the title in a strong tag, like <strong>(title)</strong> and add a <br> before and after it. Use the product's id wrapped in a <span> tag with the className='hidden' and the id='product-id'
     """
 

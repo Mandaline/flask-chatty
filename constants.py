@@ -22,7 +22,7 @@ face_shapes_guide = """
 """
 
 face_shapes_guide_prompt = f"""
-	Look at this image and decide which face shape is closest to the face in the image.
+	Look at this image and decide which two face shapes are closest to the face in the image.
 
 	Step-by-Step Process:
 	Look at the Forehead, Cheekbones, Jawline, and Chin:
@@ -33,10 +33,10 @@ face_shapes_guide_prompt = f"""
   	{face_shapes_guide}
 
 	Task:
-	Identify the Face Shape:
-	Using the guidelines above, look at the proportions of the face in the image. Decide which of the seven face shape categories (round, square, heart, oval, triangle, diamond, rectangle) best fits the facial structure.
+	Identify the Face Shapes:
+	Using the guidelines above, look at the proportions of the face in the image. Decide which TWO of the seven face shape categories (round, square, heart, oval, triangle, diamond, rectangle) best fits the facial structure.
 	Provide a Sunglasses Recommendation:
-	After identifying the face shape, recommend one or more styles of sunglasses that would complement the identified face shape, based on the guidelines provided above.
+	After identifying the two face shapes, recommend one or more styles of sunglasses that would complement the identified face shapes, based on the guidelines provided above.
 """
 
 sunglass_styles = """

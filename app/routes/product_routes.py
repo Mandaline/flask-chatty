@@ -9,7 +9,6 @@ from supabase_utils.supabase_operations import (
     delete_image_from_storage
 )
 
-# Define the blueprint for image routes
 product_bp = Blueprint('product_bp', __name__)
 
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'webp'}
@@ -37,7 +36,6 @@ def upload_image():
         embeddings = embedding_service.get_embedding_from_description(optimized_description)
         keywords = embedding_service.generate_keywords(optimized_description)
 
-        # Store the product in Supabase
         store_in_supabase(title, user_description, optimized_description, image_url, keywords, embeddings)
 
         return jsonify({"optimized_description": optimized_description})
