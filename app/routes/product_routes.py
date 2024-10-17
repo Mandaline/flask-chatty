@@ -1,6 +1,6 @@
 from flask import Blueprint, jsonify, request
 from werkzeug.utils import secure_filename
-from ..services import embedding_service
+from ..services import product_service
 from supabase_utils.supabase_operations import (
 	get_product_by_id,
 	store_in_supabase,
@@ -32,9 +32,9 @@ def upload_image():
 		if not image_url:
 			return jsonify({"error": "Failed to upload image to Supabase"}), 500
 
-		optimized_description = embedding_service.generate_optimized_description(image_url, user_description, title)
-		embeddings = embedding_service.get_embedding_from_description(optimized_description)
-		keywords = embedding_service.generate_keywords(optimized_description)
+		optimized_description = product_service.generate_optimized_description(image_url, user_description, title)
+		embeddings = product_service.get_embedding_from_description(optimized_description)
+		keywords = product_service.generate_keywords(optimized_description)
 
 		store_in_supabase(title, user_description, optimized_description, image_url, keywords, embeddings)
 
